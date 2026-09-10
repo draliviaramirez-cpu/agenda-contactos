@@ -1,8 +1,10 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import type { Contacto } from "../types/Contacto";
 
 interface FormularioContactoProps {
   onAgregar: (contacto: Contacto) => void;
+  onActualizar: (id: string, datos: Partial<Contacto>) => void;
+  contactoEditando?: Contacto | null;
 }
 
 const estadoInicial = {
@@ -18,16 +20,33 @@ const estadoInicial = {
 
 function FormularioContacto({
   onAgregar,
+  onActualizar,
+  contactoEditando,
 }: FormularioContactoProps) {
   const [formulario, setFormulario] = useState(estadoInicial);
 
+  // Precargar datos si hay contacto en edición
+  useEffect(() => {
+    if (contactoEditando) {
+      setFormulario({
+        nombreCompleto: contactoEditando.nombreCompleto,
+        empresa: contactoEditando.empresa,
+        telefono: contactoEditando.telefono,
+        correo: contactoEditando.correo,
+        etiquetas: contactoEditando.etiquetas,
+        proximoSeguimiento: contactoEditando.proximoSeguimiento,
+        notaGeneral: contactoEditando.notaGeneral,
+        fechaUltimoContacto: contactoEditando.fechaUltimoContacto,
+      });
+    } else {
+      setFormulario(estadoInicial);
+    }
+  }, [contactoEditando]);
+
   function manejarCambio(
-    evento: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement
-    >,
+    evento: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) {
     const { name, value } = evento.target;
-
     setFormulario((datosAnteriores) => ({
       ...datosAnteriores,
       [name]: value,
@@ -37,13 +56,17 @@ function FormularioContacto({
   function manejarEnvio(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
 
-    const nuevoContacto: Contacto = {
-      id: crypto.randomUUID(), 
-      ...formulario,
-      interacciones: [],
-    };
+    if (contactoEditando) {
+      onActualizar(contactoEditando.id, formulario);
+    } else {
+      const nuevoContacto: Contacto = {
+        id: crypto.randomUUID(),
+        ...formulario,
+        interacciones: [],
+      };
+      onAgregar(nuevoContacto);
+    }
 
-    onAgregar(nuevoContacto);
     setFormulario(estadoInicial);
   }
 
@@ -53,18 +76,14 @@ function FormularioContacto({
       className="rounded-xl bg-white p-6 shadow-md"
     >
       <h2 className="mb-6 text-xl font-bold text-gray-800">
-        Registrar contacto
+        {contactoEditando ? "Editar contacto" : "Registrar contacto"}
       </h2>
 
       <div className="grid gap-5 md:grid-cols-2">
         <div>
-          <label
-            htmlFor="nombreCompleto"
-            className="mb-1 block font-medium text-gray-700"
-          >
+          <label htmlFor="nombreCompleto" className="mb-1 block font-medium text-gray-700">
             Nombre completo
           </label>
-
           <input
             id="nombreCompleto"
             name="nombreCompleto"
@@ -77,13 +96,9 @@ function FormularioContacto({
         </div>
 
         <div>
-          <label
-            htmlFor="empresa"
-            className="mb-1 block font-medium text-gray-700"
-          >
+          <label htmlFor="empresa" className="mb-1 block font-medium text-gray-700">
             Empresa/Organización
           </label>
-
           <input
             id="empresa"
             name="empresa"
@@ -95,13 +110,9 @@ function FormularioContacto({
         </div>
 
         <div>
-          <label
-            htmlFor="telefono"
-            className="mb-1 block font-medium text-gray-700"
-          >
+          <label htmlFor="telefono" className="mb-1 block font-medium text-gray-700">
             Teléfono
           </label>
-
           <input
             id="telefono"
             name="telefono"
@@ -114,13 +125,9 @@ function FormularioContacto({
         </div>
 
         <div>
-          <label
-            htmlFor="correo"
-            className="mb-1 block font-medium text-gray-700"
-          >
+          <label htmlFor="correo" className="mb-1 block font-medium text-gray-700">
             Correo electrónico
           </label>
-
           <input
             id="correo"
             name="correo"
@@ -133,13 +140,9 @@ function FormularioContacto({
         </div>
 
         <div>
-          <label
-            htmlFor="etiquetas"
-            className="mb-1 block font-medium text-gray-700"
-          >
+          <label htmlFor="etiquetas" className="mb-1 block font-medium text-gray-700">
             Etiqueta o grupo
           </label>
-
           <input
             id="etiquetas"
             name="etiquetas"
@@ -152,13 +155,9 @@ function FormularioContacto({
         </div>
 
         <div>
-          <label
-            htmlFor="proximoSeguimiento"
-            className="mb-1 block font-medium text-gray-700"
-          >
+          <label htmlFor="proximoSeguimiento" className="mb-1 block font-medium text-gray-700">
             Próximo seguimiento
           </label>
-
           <input
             id="proximoSeguimiento"
             name="proximoSeguimiento"
@@ -170,13 +169,9 @@ function FormularioContacto({
         </div>
 
         <div>
-          <label
-            htmlFor="fechaUltimoContacto"
-            className="mb-1 block font-medium text-gray-700"
-          >
+          <label htmlFor="fechaUltimoContacto" className="mb-1 block font-medium text-gray-700">
             Fecha del último contacto
           </label>
-
           <input
             id="fechaUltimoContacto"
             name="fechaUltimoContacto"
@@ -188,13 +183,9 @@ function FormularioContacto({
         </div>
 
         <div className="md:col-span-2">
-          <label
-            htmlFor="notaGeneral"
-            className="mb-1 block font-medium text-gray-700"
-          >
+          <label htmlFor="notaGeneral" className="mb-1 block font-medium text-gray-700">
             Nota general
           </label>
-
           <textarea
             id="notaGeneral"
             name="notaGeneral"
@@ -208,9 +199,13 @@ function FormularioContacto({
 
       <button
         type="submit"
-        className="mt-6 rounded-lg bg-gray-800 px-6 py-3 font-semibold text-white transition hover:bg-red-800"
+        className={`mt-6 rounded-lg px-6 py-3 font-semibold text-white transition ${
+          contactoEditando
+            ? "bg-blue-600 hover:bg-blue-700"
+            : "bg-gray-800 hover:bg-red-800"
+        }`}
       >
-        Guardar contacto
+        {contactoEditando ? "Actualizar contacto" : "Guardar contacto"}
       </button>
     </form>
   );
