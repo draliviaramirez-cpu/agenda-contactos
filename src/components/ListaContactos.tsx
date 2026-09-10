@@ -10,6 +10,8 @@ interface ListaContactosProps {
     contactoId: string,
     interaccion: Interaccion,
   ) => void;
+  onEliminar: (contactoId: string) => void;
+  onEditar: (contactoId: string) => void;
 }
 
 function mostrarFecha(fecha: string) {
@@ -42,12 +44,14 @@ function seguimientoEstaVencido(fecha: string) {
 function ListaContactos({
   contactos,
   onAgregarInteraccion,
+  onEliminar,
+  onEditar,
 }: ListaContactosProps) {
   if (contactos.length === 0) {
     return (
       <section className="mt-8 rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center">
         <h2 className="text-xl font-semibold text-gray-700">
-          No e encontraron contactos
+          No se encontraron contactos
         </h2>
 
         <p className="mt-2 text-gray-500">
@@ -129,30 +133,45 @@ function ListaContactos({
                     Último contacto:
                   </span>{" "}
                   {mostrarFecha(contacto.fechaUltimoContacto)}
-                </p>
+             </p>
 
-                {contacto.notaGeneral && (
-                  <div className="mt-4 rounded-lg bg-white p-3">
-                    <p className="font-semibold">Nota general</p>
+             {contacto.notaGeneral && (
+               <div className="mt-4 rounded-lg bg-white p-3">
+                 <p className="font-semibold">Nota general</p>
+                 <p className="mt-1 text-gray-600">
+                   {contacto.notaGeneral}
+                 </p>
+               </div>
+             )}
+           </div>
 
-                    <p className="mt-1 text-gray-600">
-                      {contacto.notaGeneral}
-                    </p>
-                  </div>
-                )}
-              </div>
-              <HistorialInteracciones
-                contactoId={contacto.id}
-                interacciones={contacto.interacciones ?? []}
-                onAgregarInteraccion={onAgregarInteraccion}
-              />
-              
-            </article>
-          );
-        })}
-      </div>
-    </section>
+           {/* Botones CRUD */}
+           <div className="mt-4 flex gap-3">
+             <button
+               onClick={() => onEditar(contacto.id)}
+               className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+             >
+               ✏️ Editar
+             </button>
+
+             <button
+               onClick={() => onEliminar(contacto.id)}
+               className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+             >
+               🗑️ Eliminar
+             </button>
+           </div>
+
+           <HistorialInteracciones
+             contactoId={contacto.id}
+             interacciones={contacto.interacciones ?? []}
+             onAgregarInteraccion={onAgregarInteraccion}
+           />
+         </article>
+       );
+     })}
+   </div>
+ </section>
   );
 }
-
 export default ListaContactos;
