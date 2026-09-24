@@ -11,6 +11,10 @@ interface ListaContactosProps {
     interaccion: Interaccion,
   ) => void;
   onEliminar: (contactoId: string) => void;
+  onEliminarInteraccion: (
+  contactoId: string,
+  interaccionId: string,
+) => void;
   onEditar: (contactoId: string) => void;
 }
 
@@ -45,6 +49,7 @@ function ListaContactos({
   contactos,
   onAgregarInteraccion,
   onEliminar,
+  onEliminarInteraccion,
   onEditar,
 }: ListaContactosProps) {
   if (contactos.length === 0) {
@@ -155,7 +160,15 @@ function ListaContactos({
              </button>
 
              <button
-               onClick={() => onEliminar(contacto.id)}
+               onClick={() => {
+                  if (
+                  window.confirm(
+                  `¿Eliminar a ${contacto.nombreCompleto}? Esta acción no se puede deshacer.`,
+                  )
+                ) {
+                onEliminar(contacto.id);
+              }
+              }}
                className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
              >
                🗑️ Eliminar
@@ -163,10 +176,11 @@ function ListaContactos({
            </div>
 
            <HistorialInteracciones
-             contactoId={contacto.id}
-             interacciones={contacto.interacciones ?? []}
-             onAgregarInteraccion={onAgregarInteraccion}
-           />
+            contactoId={contacto.id}
+            interacciones={contacto.interacciones ?? []}
+            onAgregarInteraccion={onAgregarInteraccion}
+            onEliminarInteraccion={onEliminarInteraccion}
+          />
          </article>
        );
      })}

@@ -5,6 +5,7 @@ interface FormularioContactoProps {
   onAgregar: (contacto: Contacto) => void;
   onActualizar: (id: string, datos: Partial<Contacto>) => void;
   contactoEditando?: Contacto | null;
+  onCancelarEdicion: () => void;
 }
 
 const estadoInicial = {
@@ -22,9 +23,9 @@ function FormularioContacto({
   onAgregar,
   onActualizar,
   contactoEditando,
+  onCancelarEdicion,
 }: FormularioContactoProps) {
   const [formulario, setFormulario] = useState(estadoInicial);
-
   // Precargar datos si hay contacto en edición
   useEffect(() => {
     if (contactoEditando) {
@@ -183,16 +184,30 @@ function FormularioContacto({
         </div>
       </div>
 
-      <button
-        type="submit"
-        className={`mt-6 rounded-lg px-6 py-3 font-semibold text-white transition ${
-          contactoEditando
-            ? "bg-blue-600 hover:bg-blue-700"
-            : "bg-gray-800 hover:bg-red-800"
-        }`}
-      >
-        {contactoEditando ? "Actualizar contacto" : "Guardar contacto"}
-      </button>
+      <div className="mt-6 flex flex-wrap gap-3">
+  <button
+    type="submit"
+    className={`rounded-lg px-6 py-3 font-semibold text-white transition ${
+      contactoEditando
+        ? "bg-blue-600 hover:bg-blue-700"
+        : "bg-gray-800 hover:bg-red-800"
+    }`}
+  >
+    {contactoEditando
+      ? "Actualizar contacto"
+      : "Guardar contacto"}
+  </button>
+
+  {contactoEditando && (
+    <button
+      type="button"
+      onClick={onCancelarEdicion}
+      className="rounded-lg bg-slate-200 px-6 py-3 font-semibold text-slate-800 hover:bg-slate-300"
+    >
+      Cancelar edición
+    </button>
+  )}
+</div>
     </form>
   );
 }
