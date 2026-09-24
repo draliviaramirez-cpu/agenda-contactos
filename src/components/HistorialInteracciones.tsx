@@ -7,9 +7,15 @@ import type {
 interface HistorialInteraccionesProps {
   contactoId: string;
   interacciones: Interaccion[];
+
   onAgregarInteraccion: (
     contactoId: string,
     interaccion: Interaccion,
+  ) => void;
+
+  onEliminarInteraccion: (
+    contactoId: string,
+    interaccionId: string,
   ) => void;
 }
 
@@ -32,6 +38,7 @@ function HistorialInteracciones({
   contactoId,
   interacciones,
   onAgregarInteraccion,
+  onEliminarInteraccion,
 }: HistorialInteraccionesProps) {
   const [tipo, setTipo] =
     useState<TipoInteraccion>("Llamada");
@@ -64,11 +71,13 @@ function HistorialInteracciones({
 
       {interacciones.length === 0 ? (
         <p className="rounded-lg bg-gray-100 p-3 text-gray-500">
-          Todavía no se han registrado ninguna interacción.
+          Todavía no se ha registrado ninguna interacción.
         </p>
       ) : (
         <div className="mb-4 space-y-3">
-          {interacciones.map((interaccion) => (
+          {[...interacciones]
+            .sort((a, b) => b.fecha.localeCompare(a.fecha))
+            .map((interaccion) => (
             <article
               key={interaccion.id}
               className="rounded-lg border border-gray-200 bg-white p-3"
@@ -86,6 +95,15 @@ function HistorialInteracciones({
               <p className="mt-2 text-gray-700">
                 {interaccion.descripcion}
               </p>
+              <button
+                type="button"
+                onClick={() =>
+                  onEliminarInteraccion(contactoId, interaccion.id)
+                }
+                className="mt-2 text-sm font-semibold text-red-700 hover:underline"
+              >
+                  Eliminar interacción
+</button>
             </article>
           ))}
         </div>

@@ -35,16 +35,27 @@ export function useContacts() {
             )
         );
     }
-    function eliminarInteraccion(contactoId: string, interaccionId: string) {
-        setContactos(
-            contactos.map((c) =>
-                c.id === contactoId
-                    ? {
-                        ...c,
-                        interacciones: c.interacciones.filter((i) => i.id !== interaccionId),
-                    }
-                    : c
-            )
+    
+    function eliminarInteraccion( contactoId: string, interaccionId: string) {
+    setContactos(
+        contactos.map((c) => {
+            if (c.id !== contactoId) return c;
+
+            const restantes = (c.interacciones ?? []).filter(
+                (i) => i.id !== interaccionId,
+            );
+
+            const ultimaFecha = restantes.reduce(
+                (max, i) => (i.fecha > max ? i.fecha : max),
+                "",
+            );
+
+            return {
+                ...c,
+                interacciones: restantes,
+                fechaUltimoContacto: ultimaFecha,
+                };
+            }),
         );
     }
 
