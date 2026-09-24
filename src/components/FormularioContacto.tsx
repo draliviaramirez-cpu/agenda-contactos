@@ -168,20 +168,6 @@ function FormularioContacto({
           />
         </div>
 
-        <div>
-          <label htmlFor="fechaUltimoContacto" className="mb-1 block font-medium text-gray-700">
-            Fecha del último contacto
-          </label>
-          <input
-            id="fechaUltimoContacto"
-            name="fechaUltimoContacto"
-            type="date"
-            value={formulario.fechaUltimoContacto}
-            onChange={manejarCambio}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-green-900"
-          />
-        </div>
-
         <div className="md:col-span-2">
           <label htmlFor="notaGeneral" className="mb-1 block font-medium text-gray-700">
             Nota general
