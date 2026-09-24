@@ -12,7 +12,16 @@ export function useBusqueda(contactos: Contacto[]) {
         setCampoBusqueda(campo);
     }
 
+    function obtenerFechaActual() {
+        const fechaActual = new Date();
+        const anio = fechaActual.getFullYear();
+        const mes = String(fechaActual.getMonth() + 1).padStart(2, "0");
+        const dia = String(fechaActual.getDate()).padStart(2, "0");
+        return `${anio}-${mes}-${dia}`;
+    }
+
     const textoBuscado = busqueda.toLowerCase();
+
     const contactosFiltrados = contactos.filter((c) => {
         const nombre = c.nombreCompleto.toLowerCase();
         const empresa = c.empresa.toLowerCase();
@@ -24,8 +33,10 @@ export function useBusqueda(contactos: Contacto[]) {
         else if (campoBusqueda === "etiqueta") coincide = etiqueta.includes(textoBuscado);
         else coincide = nombre.includes(textoBuscado) || empresa.includes(textoBuscado) || etiqueta.includes(textoBuscado);
 
-        const tieneSeguimiento = c.proximoSeguimiento !== "";
-        return coincide && (!soloPendientes || tieneSeguimiento);
+        const hoy = obtenerFechaActual();
+        const tieneSeguimientoPendiente = c.proximoSeguimiento && c.proximoSeguimiento >= hoy;
+
+        return coincide && (!soloPendientes || tieneSeguimientoPendiente);
     });
 
     return {
